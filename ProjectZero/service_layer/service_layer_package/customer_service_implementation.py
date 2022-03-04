@@ -50,5 +50,5 @@ class CustomerSlImp(CustomerSlInterface):
             proper_float_format = float(api_input)
             return proper_float_format
         except ValueError as e:
-            raise IncorrectDataField("The input from the api is not convertible to integer.")
+            raise IncorrectDataField("The input from the api is not convertible to float.")
 
