@@ -3,7 +3,6 @@ from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.string_too_long import StringTooLong
 from data_entities.customer import Customer
 from data_layer.dao_package.customer_dao_interface import CustomerDaoInterface
-from service_layer.service_layer_package.account_service_implementation import AccountSlImp
 from service_layer.service_layer_package.customer_service_interface import CustomerSlInterface
 
 
