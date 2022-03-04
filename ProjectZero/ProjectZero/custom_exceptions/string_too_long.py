@@ -1,0 +1,2 @@
+class StringTooLong(Exception):
+    pass

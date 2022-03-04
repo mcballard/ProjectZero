@@ -1,0 +1,2 @@
+class IncorrectDataField(Exception):
+    pass
