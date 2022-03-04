@@ -3,7 +3,7 @@ from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
 from custom_exceptions.record_not_found import RecordNotFound
 from data_layer.dao_package.account_dao import AccountDao
-from service_layer.servie_layer_package.account_service_implementation import AccountSlImp
+from service_layer.service_layer_package.account_service_implementation import AccountSlImp
 
 account_dao_test_object = AccountDao()
 account_sl_test_object = AccountSlImp(account_dao_test_object)

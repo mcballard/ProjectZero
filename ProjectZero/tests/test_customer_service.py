@@ -1,8 +1,9 @@
 """this module contains test for the service layer customer interactions"""
 from custom_exceptions.incorrect_data_field import IncorrectDataField
+from custom_exceptions.record_not_found import RecordNotFound
 from custom_exceptions.string_too_long import StringTooLong
 from data_layer.dao_package.customer_dao import CustomerDao
-from service_layer.servie_layer_package.customer_service_implementation import CustomerSlImp
+from service_layer.service_layer_package.customer_service_implementation import CustomerSlImp
 
 test_customer_dao = CustomerDao()
 test_customer_object = CustomerSlImp(test_customer_dao)
@@ -72,9 +73,21 @@ def test_update_customer_last_name_over_twenty():
         assert str(e) == "The name value must be a string less than 20 characters."
 
 
-def test_delete_customer_by_id_non_int():
-    try:
-        result = test_customer_object.sl_delete_customer_by_id(2.0)
-    except IncorrectDataField as e:
-        assert str(e) == "The customer id must be an integer."
 
+def test_check_for_integer_convertible_id_success():
+    new_id = test_customer_object.sl_check_for_integer_convertible_id("1")
+    assert type(new_id) == int
+
+
+def test_check_for_integer_convertible_id_is_non_convertible():
+    try:
+        new_id = test_customer_object.sl_check_for_integer_convertible_id("not convertible")
+    except IncorrectDataField as e:
+        assert str(e) =="The input from the api is not convertible to integer."
+
+
+def test_delete_customer_by_id_record_not_found():
+    try:
+        return_value = test_customer_object.sl_delete_customer_by_id(1000)
+    except RecordNotFound as e:
+        assert str(e) == "Customer record not found."
