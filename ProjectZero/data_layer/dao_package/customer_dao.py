@@ -37,6 +37,6 @@ class CustomerDao(CustomerDaoInterface):
     def delete_customer_by_id(self, customer_id: int) -> bool:
         for customers in self.customer_list:
             if customers.customer_id == customer_id:
-                self.customer_list.pop()
+                self.customer_list.remove(customers)
                 return True
         return False

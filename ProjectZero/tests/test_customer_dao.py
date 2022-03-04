@@ -1,10 +1,10 @@
 """this module contains customer data object testing code"""
 from custom_exceptions.record_not_found import RecordNotFound
-from data_entities.account import Account
+from data_layer.dao_package.account_dao import AccountDao
 from data_layer.dao_package.customer_dao import CustomerDao
 
 test_customer_object = CustomerDao()
-test_account_object_sl = Account
+test_account_dao = AccountDao()
 test_customer_1 = test_customer_object.create_customer(0, "first", "last")
 
 # positive test

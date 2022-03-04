@@ -11,10 +11,6 @@ account_sl_test_object = AccountSlImp(account_dao_test_object)
 # positive tests
 
 
-# edge case where customer_id does not relate to any id in customer_list
-
-
-
 def test_delete_account_by_account_id_success_sl():
     is_removed = account_sl_test_object.sl_delete_account_by_account_id(5)
     assert is_removed is True
