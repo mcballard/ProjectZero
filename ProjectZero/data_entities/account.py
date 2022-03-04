@@ -12,3 +12,10 @@ class Account:
         self.account_id = account_id
         self.customer_id = customer_id
         self.account_balance = account_balance
+
+    def convert_to_dictionary_json_friendly(self):
+        return {
+            "accountId": self.account_id,
+            "customerId": self.customer_id,
+            "accountBalance": self.account_balance
+        }

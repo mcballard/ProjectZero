@@ -38,10 +38,17 @@ class CustomerSlImp(CustomerSlInterface):
                 return self.customer_dao.delete_customer_by_id(customer_id)
         raise RecordNotFound("Customer record not found.")
 
-    def sl_check_for_integer_convertible_id(self, api_input: str) -> int:
+    def sl_check_for_int_convertible_arg(self, api_input: str) -> int:
         try:
-            proper_id_format = int(api_input)
-            return proper_id_format
+            proper_int_format = int(api_input)
+            return proper_int_format
+        except ValueError as e:
+            raise IncorrectDataField("The input from the api is not convertible to integer.")
+
+    def sl_check_for_float_convertible_arg(self, api_input: str) -> float:
+        try:
+            proper_float_format = float(api_input)
+            return proper_float_format
         except ValueError as e:
             raise IncorrectDataField("The input from the api is not convertible to integer.")
 
