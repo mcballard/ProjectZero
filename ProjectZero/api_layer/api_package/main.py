@@ -288,15 +288,74 @@ def deposit_funds_to_account_by_id(customer_id: str):
         return jsonify(message), 400
 
 
+@app.route("/customer/<customer_id>/accounts/<account_id>/delete", methods=["GET"])
+def delete_customer_account(customer_id: str, account_id: str):
+    try:
+        account_to_delete = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
+        customer_for_account = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
+        account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete)
+        if account_delete_response:
+            return "Your account was successfully closed."
+        else:
+            return "Unable to locate account."
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except NegativeBalance as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
+
+@app.route("/customer/<customer_id>/leave", methods=["GET"])
+def leave_bank_customer_id(customer_id: str):
+    try:
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
+        leave_bank_response = accounts_service_layer_object.sl_leave_bank_by_customer_id(sanitized_customer_id)
+        remove_customer = customer_service_layer_object.sl_delete_customer_by_id(sanitized_customer_id)
+        if leave_bank_response and remove_customer:
+            return "Your accounts were successfully closed and you are no longer a customer."
+        else:
+            return "Unable to locate accounts or customer records."
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except NegativeBalance as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
 """
 @app.route("/customer/<customer_id>/accounts/update", methods=["POST"])
 def update_customer_account():
     pass
 
-
-@app.route("/customer/<customer_id>/accounts/delete", methods=["POST"])
-def delete_customer_account():
-    pass
 """
 
 app.run()

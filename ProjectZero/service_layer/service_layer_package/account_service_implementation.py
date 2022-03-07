@@ -33,13 +33,13 @@ class AccountSlImp(AccountSlInterface):
     def sl_delete_account_by_account_id(self, account_id: int) -> bool:
         for accounts in self.account_dao.account_list:
             if accounts.account_id == account_id:
-                self.account_dao.account_list.remove(accounts)
+                self.account_dao.delete_account_by_id(accounts.account_id)
                 return True
         return False
 
     def sl_leave_bank_by_customer_id(self, customer_id: int) -> []:
         is_record_removed = False
-        amount_withdrawn = 0
+        amount_withdrawn: float = 0
         accounts_to_close = self.sl_get_all_accounts_by_customer_id(customer_id)
         for accounts in accounts_to_close:
             amount_to_withdraw = accounts.account_balance
@@ -58,13 +58,12 @@ class AccountSlImp(AccountSlInterface):
         closed_account = self.withdraw_from_account_by_id(account_to_close.account_id, account_to_close.customer_id, amount_to_withdraw)
         for accounts in self.account_dao.account_list:
             if accounts.account_id == account_id:
-                self.account_dao.account_list.remove(accounts)
+                self.sl_delete_account_by_account_id(accounts.account_id)
                 is_record_removed = True
                 break
         if is_record_removed and (closed_account.account_balance == 0):
             return True, amount_to_withdraw
-        else:
-            return False
+        raise RecordNotFound("Record not found.")
 
     def deposit_to_account_by_id(self, account_id: int, amount_to_change: float) -> Account:
         for accounts in self.account_dao.account_list:
