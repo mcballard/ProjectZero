@@ -31,7 +31,7 @@ class AccountSlInterface(ABC):
         pass
 
     @abstractmethod
-    def withdraw_from_account_by_id(self, account_id: int, amount_to_withdraw: float) -> Account:
+    def withdraw_from_account_by_id(self, account_id: int, customer_id, amount_to_withdraw: float) -> Account:
         pass
 
     @abstractmethod

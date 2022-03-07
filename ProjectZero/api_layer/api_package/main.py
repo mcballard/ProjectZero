@@ -1,7 +1,9 @@
 """this module will contain the rest functionality for the project"""
 from flask import Flask, request, jsonify
 
+from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
+from custom_exceptions.negative_balance import NegativeBalance
 from custom_exceptions.record_not_found import RecordNotFound
 from custom_exceptions.string_too_long import StringTooLong
 from data_entities.account import Account
@@ -139,7 +141,7 @@ def create_customer_account(customer_id: str):
 
 
 @app.route("/customer/<customer_id>/accounts/<account_id>/info", methods=["GET"])
-def get_customer_account(customer_id: str, account_id: str):
+def get_customer_account(account_id: str):
     try:
         sanitized_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
         account_info = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_account_id)
@@ -155,6 +157,136 @@ def get_customer_account(customer_id: str, account_id: str):
             "message": str(e)
         }
         return jsonify(message), 400
+
+
+@app.route("/customer/<customer_id>/accounts/info", methods=["GET"])
+def get_all_customer_accounts(customer_id: str):
+    try:
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
+        accounts_info = accounts_service_layer_object.sl_get_all_accounts_by_customer_id(sanitized_customer_id)
+        dictionary_concat = "{"
+        for account in accounts_info:
+            dictionary_concat += "'account" + str(account.account_id) + "':" + str(account.convert_to_dictionary_json_friendly())
+        dictionary_concat += "}"
+        return jsonify(dictionary_concat), 200
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
+
+@app.route("/customer/<customer_id>/accounts/transfer/", methods=["POST"])
+def transfer_funds_between_accounts(customer_id: str):
+    try:
+        account_data: dict = request.get_json()
+        from_account_id = account_data["fromAccount"]
+        to_account_id = account_data["toAccount"]
+        amount_to_transfer = account_data["amountToTransfer"]
+        sanitized_from_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(from_account_id)
+        sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
+        sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_transfer)
+        from_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_from_account_id)
+        to_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_to_account_id)
+        transferred_accounts = accounts_service_layer_object.transfer_to_account(from_account, to_account, sanitized_amount_to_transfer)
+        accounts_dictionary = {
+                                "accountFrom": {"accountId": transferred_accounts[0].account_id, "newBalance": transferred_accounts[0].account_balance},
+                                "accountTo": {"accountId": transferred_accounts[1].account_id, "newBalance": transferred_accounts[1].account_balance}
+                              }
+        return jsonify(accounts_dictionary), 200
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except NegativeBalance as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
+
+@app.route("/customer/<customer_id>/accounts/withdraw", methods=["POST"])
+def withdraw_funds_from_account_by_id(customer_id: str):
+    try:
+        account_data: dict = request.get_json()
+        from_account_id = account_data["fromAccount"]
+        amount_to_withdraw = account_data["amountToWithdraw"]
+        sanitized_from_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(from_account_id)
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
+        sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_withdraw)
+        withdrawn_account = accounts_service_layer_object.withdraw_from_account_by_id(sanitized_from_account_id, sanitized_customer_id, sanitized_amount_to_transfer)
+        account_dictionary = withdrawn_account.convert_to_dictionary_json_friendly()
+        return jsonify(account_dictionary), 200
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except NegativeBalance as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
+
+@app.route("/customer/<customer_id>/accounts/deposit", methods=["POST"])
+def deposit_funds_to_account_by_id(customer_id: str):
+    try:
+        account_data: dict = request.get_json()
+        to_account_id = account_data["toAccount"]
+        amount_to_deposit = account_data["amountToDeposit"]
+        sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
+        sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_deposit)
+        deposited_account = accounts_service_layer_object.deposit_to_account_by_id(sanitized_to_account_id, sanitized_amount_to_transfer)
+        account_dictionary = deposited_account.convert_to_dictionary_json_friendly()
+        return jsonify(account_dictionary), 200
+    except IncorrectDataField as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except RecordNotFound as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+    except NegativeBalance as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
+
 
 """
 @app.route("/customer/<customer_id>/accounts/update", methods=["POST"])

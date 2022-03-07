@@ -10,11 +10,13 @@ class AccountDao(AccountDaoInterface):
     account_list = []
 
     def __init__(self):
-        default_test_account = Account(0, 1, 1000)
+        pass
+        """
         self.account_id = default_test_account.account_id
         self.customer_id = default_test_account.customer_id
         self.account_balance = default_test_account.account_balance
         self.account_list.append(default_test_account)
+        """
 
     def create_account(self, account_id: int, customer_id: int, account_balance: float) -> Account:
         if account_balance < 0:
@@ -53,4 +55,5 @@ class AccountDao(AccountDaoInterface):
                 self.account_list.remove(accounts)
                 return True
         raise RecordNotFound("Record not found.")
+
 

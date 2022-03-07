@@ -41,12 +41,12 @@ def test_get_all_account_info_by_customer_id_success():
 
 
 def test_update_account_by_id_success():
-    result = account_dao_test_object.update_account_by_id(account_dao_test_object.account_id, 100)
+    result = account_dao_test_object.update_account_by_id(1, 100)
     assert result.account_balance != 1000
 
 
 def test_delete_account_by_id_success():
-    is_removed = account_dao_test_object.delete_account_by_id(account_dao_test_object.account_id)
+    is_removed = account_dao_test_object.delete_account_by_id(1)
     assert is_removed is True
 
 # negative tests

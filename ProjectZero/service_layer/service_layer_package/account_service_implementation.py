@@ -1,4 +1,5 @@
 """this module contains the implementation of the service level account interactions"""
+from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
 from custom_exceptions.record_not_found import RecordNotFound
@@ -42,7 +43,7 @@ class AccountSlImp(AccountSlInterface):
         accounts_to_close = self.sl_get_all_accounts_by_customer_id(customer_id)
         for accounts in accounts_to_close:
             amount_to_withdraw = accounts.account_balance
-            closed_account = self.withdraw_from_account_by_id(accounts.account_id, amount_to_withdraw)
+            closed_account = self.withdraw_from_account_by_id(accounts.account_id, accounts.customer_id, amount_to_withdraw)
             amount_withdrawn += amount_to_withdraw
             is_record_removed = self.sl_delete_account_by_account_id(closed_account.account_id)
         if is_record_removed and (amount_withdrawn != 0):
@@ -54,7 +55,7 @@ class AccountSlImp(AccountSlInterface):
         is_record_removed = False
         account_to_close = self.sl_get_account_info_by_id(account_id)
         amount_to_withdraw = account_to_close.account_balance
-        closed_account = self.withdraw_from_account_by_id(account_to_close.account_id, amount_to_withdraw)
+        closed_account = self.withdraw_from_account_by_id(account_to_close.account_id, account_to_close.customer_id, amount_to_withdraw)
         for accounts in self.account_dao.account_list:
             if accounts.account_id == account_id:
                 self.account_dao.account_list.remove(accounts)
@@ -73,11 +74,13 @@ class AccountSlImp(AccountSlInterface):
                 return updated_account
         raise RecordNotFound("Account not found.")
 
-    def withdraw_from_account_by_id(self, account_id: int, amount_to_change: float) -> Account:
+    def withdraw_from_account_by_id(self, account_id: int, customer_id, amount_to_change: float) -> Account:
         for accounts in self.account_dao.account_list:
             if accounts.account_id == account_id:
                 if accounts.account_balance < amount_to_change:
                     raise NegativeBalance("You do not have sufficient funds.")
+                elif accounts.customer_id != customer_id:
+                    raise CustomerIdMismatch("You cannot withdraw from another customer's account.")
                 else:
                     account_to_change = self.account_dao.get_account_info_by_id(account_id)
                     updated_account = self.account_dao.update_account_by_id(account_to_change.account_id, -amount_to_change)
@@ -91,7 +94,7 @@ class AccountSlImp(AccountSlInterface):
             for existing_account in self.account_dao.account_list:
                 if from_account.account_id == existing_account.account_id:
                     account_to_withdraw = self.sl_get_account_info_by_id(from_account.account_id)
-                    withdrawn_account = self.withdraw_from_account_by_id(account_to_withdraw.account_id, amount_to_transfer)
+                    withdrawn_account = self.withdraw_from_account_by_id(account_to_withdraw.account_id, account_to_withdraw.customer_id, amount_to_transfer)
                 elif to_account.account_id == existing_account.account_id:
                     account_to_transfer = self.sl_get_account_info_by_id(to_account.account_id)
                     deposited_account = self.deposit_to_account_by_id(account_to_transfer.account_id, amount_to_transfer)

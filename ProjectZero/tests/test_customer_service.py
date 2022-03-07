@@ -73,7 +73,6 @@ def test_update_customer_last_name_over_twenty():
         assert str(e) == "The name value must be a string less than 20 characters."
 
 
-
 def test_check_for_int_convertible_id_success():
     new_id = test_customer_object.sl_check_for_int_convertible_arg("1")
     assert type(new_id) == int
@@ -83,7 +82,7 @@ def test_check_for_float_convertible_id_is_non_convertible():
     try:
         new_id = test_customer_object.sl_check_for_int_convertible_arg("not convertible")
     except IncorrectDataField as e:
-        assert str(e) =="The input from the api is not convertible to integer."
+        assert str(e) == "The input from the api is not convertible to integer."
 
 
 def test_check_for_float_convertible_id_success():
@@ -95,8 +94,7 @@ def test_check_for_float_convertible_is_non_convertible():
     try:
         new_id = test_customer_object.sl_check_for_float_convertible_arg("not convertible")
     except IncorrectDataField as e:
-        assert str(e) =="The input from the api is not convertible to float."
-
+        assert str(e) == "The input from the api is not convertible to float."
 
 
 def test_delete_customer_by_id_record_not_found():
