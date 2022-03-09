@@ -24,19 +24,20 @@ def test_get_customer_by_id_record_not_found():
     try:
         result = test_customer_object.get_customer_by_id(0)
     except RecordNotFound as e:
-        assert str(e) == "Customer record not found."
+        assert str(e) == "Could not find record in database."
 
 
 def test_update_customer_first_name_success():
-    result = test_customer_object.update_customer(1, "matt", "last")
+    result = test_customer_object.update_customer(30, "matt", "last")
     assert result.first_name != "first"
 
 
 def test_update_customer_last_name_success():
-    result = test_customer_object.update_customer(1, "first", "bananas")
+    result = test_customer_object.update_customer(31, "first", "bananas")
     assert result.last_name != "last"
 
 
+# will fail unless updated
 def test_delete_customer_by_id_success():
     result = test_customer_object.delete_customer_by_id(1)
     assert result

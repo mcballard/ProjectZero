@@ -1,4 +1,6 @@
 """this module contains test for the service layer customer interactions"""
+from unittest.mock import MagicMock
+
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.record_not_found import RecordNotFound
 from custom_exceptions.string_too_long import StringTooLong
@@ -102,3 +104,11 @@ def test_delete_customer_by_id_record_not_found():
         return_value = test_customer_object.sl_delete_customer_by_id(1000)
     except RecordNotFound as e:
         assert str(e) == "Customer record not found."
+
+"""
+looking for connection errors in database
+
+
+def test_catch_operational_error_with_connect_object():
+    test_customer_object.customer_dao.create_customer = MagicMock(return_value=)
+"""

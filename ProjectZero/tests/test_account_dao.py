@@ -25,8 +25,8 @@ def test_create_account_success():
 
 
 def test_get_account_info_by_id_success():
-    result = account_dao_test_object.get_account_info_by_id(account_dao_test_object.account_list[0].account_id)
-    assert result.account_id == account_dao_test_object.account_list[0].account_id
+    result = account_dao_test_object.get_account_info_by_id(7)
+    assert result.account_id == 7
 
 
 def test_get_all_account_info_by_customer_id_success():
@@ -41,10 +41,11 @@ def test_get_all_account_info_by_customer_id_success():
 
 
 def test_update_account_by_id_success():
-    result = account_dao_test_object.update_account_by_id(1, 100)
-    assert result.account_balance != 1000
+    result = account_dao_test_object.update_account_by_id(7, 100)
+    assert result.account_id == 7
 
 
+# will fail unless updated with valid id
 def test_delete_account_by_id_success():
     is_removed = account_dao_test_object.delete_account_by_id(1)
     assert is_removed is True
@@ -61,7 +62,7 @@ def test_create_account_negative_balance():
 
 def test_get_record_by_id_record_not_found():
     try:
-        result = account_dao_test_object.get_account_info_by_id(account_dao_test_object.account_list[2].customer_id)
+        result = account_dao_test_object.get_account_info_by_id(1)
     except RecordNotFound as e:
         assert str(e) != "Record not found."
 

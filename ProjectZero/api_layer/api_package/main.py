@@ -141,10 +141,15 @@ def create_customer_account(customer_id: str):
 
 
 @app.route("/customer/<customer_id>/accounts/<account_id>/info", methods=["GET"])
-def get_customer_account(account_id: str):
+def get_customer_account(account_id: str, customer_id: str):
     try:
         sanitized_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
         account_info = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_account_id)
+        if account_info.customer_id != customer_id:
+            message = {
+                "message": "You do not have access you other customer's accounts"
+            }
+            return jsonify(message)
         account_dictionary = account_info.convert_to_dictionary_json_friendly()
         return jsonify(account_dictionary), 200
     except IncorrectDataField as e:
@@ -164,9 +169,16 @@ def get_all_customer_accounts(customer_id: str):
     try:
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         accounts_info = accounts_service_layer_object.sl_get_all_accounts_by_customer_id(sanitized_customer_id)
-        dictionary_concat = "{"
+        dictionary_concat = "{ "
+        comma_count = 0
+        too_many_commas = 0
+        for commas in accounts_info:
+            too_many_commas += 1
         for account in accounts_info:
+            comma_count += 1
             dictionary_concat += "'account" + str(account.account_id) + "':" + str(account.convert_to_dictionary_json_friendly())
+            if comma_count < too_many_commas:
+                dictionary_concat += ","
         dictionary_concat += "}"
         return jsonify(dictionary_concat), 200
     except IncorrectDataField as e:
