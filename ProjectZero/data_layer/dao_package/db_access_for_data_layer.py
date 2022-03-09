@@ -8,7 +8,7 @@ test_customer = Customer(0, "Matt", "Ballard")
 test_account = Account(0, 2, 15000)
 
 
-def create_customer_entry(table_row_object):
+def create_table_row_entry(table_row_object):
     # create sql query
     sql_query = f"insert into {table_row_object.class_name} values(default,%s,%s) returning *"
     # create cursor object to handle query
@@ -41,7 +41,7 @@ print(result_customer.__str__())
 """
 
 
-def select_customer_record(object_unique_id: int, table_to_access: str):
+def select_table_record(object_unique_id: int, table_to_access: str):
     # select does not need a commit as it is read only
     # connection will close after function returns value
     if table_to_access == "customers":
@@ -66,7 +66,7 @@ def select_customer_record(object_unique_id: int, table_to_access: str):
             return result_account_object
 
 
-def select_all_customer_records(table_row_object):
+def select_all_table_records_by_id(table_row_object):
     if table_row_object.class_name == "customers":
         sql_query = f"select * from {table_row_object.class_name} where customer_id = {table_row_object.customer_id}"
     elif table_row_object.class_name == "accounts":
@@ -93,7 +93,7 @@ def select_all_customer_records(table_row_object):
         raise RecordNotFound("No records found.")
 
 
-def update_customer_record(table_row_object):
+def update_table_record(table_row_object):
     try:
         if table_row_object.class_name == "customers":
             sql_query = f"update {table_row_object.class_name} set first_name=%s, last_name=%s where customer_id=%s returning customer_id, first_name, last_name"
@@ -124,7 +124,7 @@ def update_customer_record(table_row_object):
         raise DatabaseError(str(e))
 
 
-def delete_customer_record(object_id, table_to_access):
+def delete_table_record(object_id, table_to_access):
     if table_to_access == "customers":
         sql_query = f"delete from {table_to_access} where customer_id=%s"
         cursor = connection.cursor()
