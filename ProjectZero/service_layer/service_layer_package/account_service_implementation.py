@@ -60,9 +60,11 @@ class AccountSlImp(AccountSlInterface):
         else:
             raise RecordNotFound("No accounts closed.")
 
-    def sl_close_account_by_id(self, account_id: int) -> []:
+    def sl_close_account_by_id(self, account_id: int, customer_id: int) -> []:
         is_record_removed = False
         account_to_close = self.sl_get_account_info_by_id(account_id)
+        if account_to_close.customer_id != customer_id:
+            raise CustomerIdMismatch("You cannot access someone else's accounts.")
         amount_to_withdraw = account_to_close.account_balance
         closed_account = self.withdraw_from_account_by_id(account_to_close.account_id, account_to_close.customer_id, amount_to_withdraw)
         for accounts in self.account_dao.account_list:

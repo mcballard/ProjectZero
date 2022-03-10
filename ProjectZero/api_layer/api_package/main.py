@@ -1,4 +1,6 @@
 """this module will contain the rest functionality for the project"""
+from ast import literal_eval
+
 from flask import Flask, request, jsonify
 
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
@@ -180,7 +182,8 @@ def get_all_customer_accounts(customer_id: str):
             if comma_count < too_many_commas:
                 dictionary_concat += ","
         dictionary_concat += "}"
-        return jsonify(dictionary_concat), 200
+        dictionary_for_accounts = literal_eval(dictionary_concat)
+        return jsonify(dictionary_for_accounts), 200
     except IncorrectDataField as e:
         message = {
             "message": str(e)
@@ -305,7 +308,7 @@ def delete_customer_account(customer_id: str, account_id: str):
     try:
         account_to_delete = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
         customer_for_account = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
-        account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete)
+        account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete, customer_id)
         if account_delete_response:
             return "Your account was successfully closed."
         else:
