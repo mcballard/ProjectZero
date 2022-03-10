@@ -25,9 +25,11 @@ class AccountSlImp(AccountSlInterface):
             raise IncorrectDataField("Must have customer id to connect to account.")
         return self.account_dao.create_account(0, customer_id, account_balance)
 
-    def sl_get_account_info_by_id(self, account_id: int) -> Account:
+    def sl_get_account_info_by_id(self, account_id: int, customer_id: int) -> Account:
         if type(account_id) != int:
             raise IncorrectDataField("The customer id must be an integer.")
+        if self.account_dao.get_account_info_by_id(account_id).customer_id != customer_id:
+            raise CustomerIdMismatch("You do not have access to other customer accounts.")
         return self.account_dao.get_account_info_by_id(account_id)
 
     def sl_get_all_accounts_by_customer_id(self, customer_id: int) -> []:
@@ -67,17 +69,19 @@ class AccountSlImp(AccountSlInterface):
             raise CustomerIdMismatch("You cannot access someone else's accounts.")
         amount_to_withdraw = account_to_close.account_balance
         closed_account = self.withdraw_from_account_by_id(account_to_close.account_id, account_to_close.customer_id, amount_to_withdraw)
-        for accounts in self.account_dao.account_list:
-            if operator.is_(accounts.account_id, account_id):
-                self.sl_delete_account_by_account_id(accounts.account_id)
-                is_record_removed = True
-                break
+        #for accounts in self.account_dao.account_list:
+        #    if operator.is_(accounts.account_id, account_id):
+        self.sl_delete_account_by_account_id(account_id)
+        is_record_removed = True
+        #        break
         if is_record_removed and (closed_account.account_balance == 0):
             return True, amount_to_withdraw
         raise RecordNotFound("Record not found.")
 
     def deposit_to_account_by_id(self, account_id: int, amount_to_change: float) -> Account:
         #for accounts in self.account_dao.account_list:
+        if amount_to_change < 0:
+            raise IncorrectDataField("Cannot deposit negative amount.")
         current_account = self.account_dao.get_account_info_by_id(account_id)
         if operator.is_(current_account.account_id, account_id):
             account_to_change = self.account_dao.get_account_info_by_id(account_id)

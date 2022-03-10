@@ -11,7 +11,7 @@ class AccountSlInterface(ABC):
         pass
 
     @abstractmethod
-    def sl_get_account_info_by_id(self, account_id: int) -> Account:
+    def sl_get_account_info_by_id(self, account_id: int, customer_id: int) -> Account:
         pass
 
     @abstractmethod

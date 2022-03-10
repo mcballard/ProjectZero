@@ -146,12 +146,8 @@ def create_customer_account(customer_id: str):
 def get_customer_account(account_id: str, customer_id: str):
     try:
         sanitized_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
-        account_info = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_account_id)
-        if account_info.customer_id != customer_id:
-            message = {
-                "message": "You do not have access you other customer's accounts"
-            }
-            return jsonify(message)
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
+        account_info = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_account_id, sanitized_customer_id)
         account_dictionary = account_info.convert_to_dictionary_json_friendly()
         return jsonify(account_dictionary), 200
     except IncorrectDataField as e:
@@ -205,9 +201,10 @@ def transfer_funds_between_accounts(customer_id: str):
         amount_to_transfer = account_data["amountToTransfer"]
         sanitized_from_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(from_account_id)
         sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_transfer)
-        from_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_from_account_id)
-        to_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_to_account_id)
+        from_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_from_account_id, sanitized_customer_id)
+        to_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_to_account_id, sanitized_customer_id)
         transferred_accounts = accounts_service_layer_object.transfer_to_account(from_account, to_account, sanitized_amount_to_transfer)
         accounts_dictionary = {
                                 "accountFrom": {"accountId": transferred_accounts[0].account_id, "newBalance": transferred_accounts[0].account_balance},
@@ -276,6 +273,9 @@ def deposit_funds_to_account_by_id(customer_id: str):
         account_data: dict = request.get_json()
         to_account_id = account_data["toAccount"]
         amount_to_deposit = account_data["amountToDeposit"]
+        # currently allow for transfer to and deposit from other customer accounts than current customer
+        # this path variable goes unused for this reason but is sanitized here so i dont forget if i change that later
+        sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
         sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_deposit)
         deposited_account = accounts_service_layer_object.deposit_to_account_by_id(sanitized_to_account_id, sanitized_amount_to_transfer)
@@ -308,7 +308,7 @@ def delete_customer_account(customer_id: str, account_id: str):
     try:
         account_to_delete = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
         customer_for_account = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
-        account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete, customer_id)
+        account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete, customer_for_account)
         if account_delete_response:
             return "Your account was successfully closed."
         else:
