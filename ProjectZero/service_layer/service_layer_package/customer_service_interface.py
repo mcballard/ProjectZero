@@ -1,6 +1,5 @@
 """this module contains service layer interface"""
 from abc import ABC, abstractmethod
-
 from data_entities.customer import Customer
 
 
@@ -21,4 +20,3 @@ class CustomerSlInterface(ABC):
     @abstractmethod
     def sl_delete_customer_by_id(self, customer_id: int) -> bool:
         pass
-

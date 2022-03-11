@@ -15,12 +15,13 @@ def test_insert_record_success():
 
 
 def test_select_record_by_id_success():
-    assert select_table_record(3, test_customer.class_name).first_name == "Matt"
+    assert select_table_record(2, test_customer.class_name).customer_id == 2
 
 
 def test_select_record_by_id_does_not_exist():
     try:
-        return_object = select_table_record(1000, test_customer.class_name).first_name == "Matt"
+        return_object = select_table_record(1000, test_customer.class_name)
+        assert False
     except RecordNotFound as e:
         assert str(e) == "Could not find record in database."
 
@@ -35,12 +36,13 @@ def test_update_record_success():
 
 # must change for next test to pass
 def test_delete_record_by_id_success():
-    assert delete_table_record(11, test_customer.class_name)
+    assert delete_table_record(2, test_customer.class_name)
 
 
 def test_delete_record_by_id_does_not_exist():
     try:
         result = delete_table_record(35, test_customer.class_name)
+        assert False
     except DatabaseError as e:
         assert str(e) == "Could not find record in database."
 
@@ -48,6 +50,7 @@ def test_delete_record_by_id_does_not_exist():
 def test_select_all_records_no_records():
     try:
         result = select_all_table_records_by_id(test_customer)
+        assert False
     except RecordNotFound as e:
         assert str(e) == "No Records Found."
 

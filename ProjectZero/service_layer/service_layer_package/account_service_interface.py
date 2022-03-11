@@ -1,6 +1,5 @@
 """this modules contains the interface for the account entity and its dao"""
 from abc import ABC, abstractmethod
-
 from data_entities.account import Account
 
 

@@ -5,7 +5,7 @@ from data_layer.dao_package.customer_dao import CustomerDao
 
 test_customer_object = CustomerDao()
 test_account_dao = AccountDao()
-test_customer_1 = test_customer_object.create_customer(0, "first", "last")
+
 
 # positive test
 
@@ -23,6 +23,7 @@ def test_get_customer_by_id_success():
 def test_get_customer_by_id_record_not_found():
     try:
         result = test_customer_object.get_customer_by_id(0)
+        assert False
     except RecordNotFound as e:
         assert str(e) == "Could not find record in database."
 
@@ -46,5 +47,6 @@ def test_delete_customer_by_id_success():
 def test_delete_customer_by_id_record_not_found():
     try:
         result = test_customer_object.delete_customer_by_id(1000)
+        assert False
     except RecordNotFound as e:
         assert str(e) == "Customer record not found."

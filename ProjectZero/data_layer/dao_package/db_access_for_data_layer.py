@@ -1,13 +1,9 @@
 from psycopg.errors import InFailedSqlTransaction
-
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
 from data_layer.dao_package.manage_connections import connection
 from custom_exceptions.database_error import DatabaseError
-
-test_customer = Customer(0, "Matt", "Ballard")
-test_account = Account(0, 2, 15000)
 
 
 def create_table_row_entry(table_row_object):
@@ -36,11 +32,6 @@ def create_table_row_entry(table_row_object):
         else:
             new_account_object = Account(*new_object)
             return new_account_object
-
-"""
-result_customer = create_customer_entry(test_customer)
-print(result_customer.__str__())
-"""
 
 
 def select_table_record(object_unique_id: int, table_to_access: str):
@@ -146,16 +137,3 @@ def delete_table_record(object_id, table_to_access):
             return True
     else:
         raise RecordNotFound("Could not find record in database.")
-
-
-"""
-testing_update_customer = CustomerForDb(4, "changed", "names")
-
-
-for customers in select_all_customer_records():
-    print(customers.__str__())
-
-
-print(select_customer_record(update_customer_record(testing_update_customer)).__str__())
-"""
-
