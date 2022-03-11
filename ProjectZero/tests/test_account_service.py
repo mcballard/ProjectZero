@@ -123,5 +123,5 @@ def test_delete_account_by_account_id_success_sl():
 
 # will fail unless updated
 def test_close_account_by_id_success_sl():
-    is_removed = account_sl_test_object.sl_close_account_by_id(19)
+    is_removed = account_sl_test_object.sl_close_account_by_id(11)
     assert is_removed[0] is True

@@ -6,7 +6,7 @@ from data_layer.dao_package.account_dao import AccountDao
 account_dao_test_object = AccountDao()
 populate_list = account_dao_test_object.create_account(0, 2, 500)
 populate_list1 = account_dao_test_object.create_account(0, 2, 500.5)
-populate_list2 = account_dao_test_object.create_account(0, 3, 500)
+populate_list2 = account_dao_test_object.create_account(0, 5, 500)
 populate_list3 = account_dao_test_object.create_account(0, 5, 500.5)
 populate_list4 = account_dao_test_object.create_account(0, 5, 500.5)
 populate_list5 = account_dao_test_object.create_account(0, 6, 500)

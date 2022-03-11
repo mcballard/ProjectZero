@@ -51,12 +51,13 @@ class AccountSlImp(AccountSlInterface):
     def sl_leave_bank_by_customer_id(self, customer_id: int) -> []:
         is_record_removed = False
         amount_withdrawn: float = 0
-        accounts_to_close: [] = self.sl_get_all_accounts_by_customer_id(customer_id)
-        for accounts in accounts_to_close:
-            amount_to_withdraw = accounts.account_balance
-            closed_account = self.withdraw_from_account_by_id(accounts.account_id, accounts.customer_id, amount_to_withdraw)
-            amount_withdrawn += amount_to_withdraw
-            is_record_removed = self.sl_delete_account_by_account_id(closed_account.account_id)
+        accounts_to_close = self.sl_get_all_accounts_by_customer_id(customer_id)
+        if accounts_to_close is not None:
+            for accounts in accounts_to_close:
+                amount_to_withdraw = accounts.account_balance
+                closed_account = self.withdraw_from_account_by_id(accounts.account_id, accounts.customer_id, amount_to_withdraw)
+                amount_withdrawn += amount_to_withdraw
+                is_record_removed = self.sl_delete_account_by_account_id(closed_account.account_id)
         if is_record_removed and (amount_withdrawn != 0):
             return True, amount_withdrawn
         else:
@@ -64,7 +65,7 @@ class AccountSlImp(AccountSlInterface):
 
     def sl_close_account_by_id(self, account_id: int, customer_id: int) -> []:
         is_record_removed = False
-        account_to_close = self.sl_get_account_info_by_id(account_id)
+        account_to_close = self.sl_get_account_info_by_id(account_id, customer_id)
         if account_to_close.customer_id != customer_id:
             raise CustomerIdMismatch("You cannot access someone else's accounts.")
         amount_to_withdraw = account_to_close.account_balance

@@ -50,7 +50,7 @@ class AccountDao(AccountDaoInterface):
         #raise RecordNotFound("No accounts for this customer found.")
 
     def update_account_by_id(self, account_id: int, balance_change: float) -> Account:
-        account_update_info: Account = select_customer_record(account_id, self.class_name)
+        account_update_info: Account = select_table_record(account_id, self.class_name)
         account_update_info.account_balance += balance_change
         return update_table_record(account_update_info)
         #for accounts in self.account_list:

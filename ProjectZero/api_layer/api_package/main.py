@@ -160,6 +160,11 @@ def get_customer_account(account_id: str, customer_id: str):
             "message": str(e)
         }
         return jsonify(message), 400
+    except CustomerIdMismatch as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message), 400
 
 
 @app.route("/customer/<customer_id>/accounts/info", methods=["GET"])

@@ -1,3 +1,5 @@
+from psycopg.errors import InFailedSqlTransaction
+
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
@@ -77,20 +79,18 @@ def select_all_table_records_by_id(table_row_object):
     cursor.execute(sql_query)
     result_object_records = cursor.fetchall()
     object_list = []
-    if table_row_object.class_name == "customers":
-        if cursor.rowcount != 0:
+    if type(object_list) is not None:
+        if table_row_object.class_name == "customers":
             for record in result_object_records:
                 customer_record = Customer(*record)
                 object_list.append(customer_record)
             return object_list
-    elif table_row_object.class_name == "accounts":
-        if cursor.rowcount != 0:
+        elif table_row_object.class_name == "accounts":
             for record in result_object_records:
                 account_record = Account(*record)
                 object_list.append(account_record)
             return object_list
-    else:
-        raise RecordNotFound("No records found.")
+    raise RecordNotFound("No records found.")
 
 
 def update_table_record(table_row_object):
@@ -134,9 +134,12 @@ def delete_table_record(object_id, table_to_access):
         if result == 1:
             return True
     elif table_to_access == "accounts":
-        sql_query = f"delete from {table_to_access} where account_id=%s"
-        cursor = connection.cursor()
-        cursor.execute(sql_query, [object_id])
+        try:
+            sql_query = f"delete from {table_to_access} where account_id=%s"
+            cursor = connection.cursor()
+            cursor.execute(sql_query, [object_id])
+        except InFailedSqlTransaction as e:
+            return str(e)
         result = cursor.rowcount
         connection.commit()
         if result == 1:
