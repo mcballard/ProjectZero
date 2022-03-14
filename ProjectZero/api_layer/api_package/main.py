@@ -32,7 +32,7 @@ accounts_data_layer_object = AccountDao()
 accounts_service_layer_object = AccountSlImp(accounts_data_layer_object)
 
 
-@app.route("/customer/create", methods=["POST"])
+@app.route("/customer", methods=["POST"])
 def create_customer():
     try:
         customer_data: dict = request.get_json()
@@ -41,6 +41,11 @@ def create_customer():
         result_dictionary = result.convert_to_dictionary_json_friendly()
         result_json = jsonify(result_dictionary)
         return result_json, 201
+    except StringTooLong as e:
+        message = {
+            "message": str(e)
+        }
+        return jsonify(message)
     except IncorrectDataField as e:
         message = {
             "message": str(e)
@@ -53,7 +58,7 @@ def create_customer():
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/info", methods=["GET"])
+@app.route("/customer/<customer_id>", methods=["GET"])
 def get_customer(customer_id: str):
     try:
         sanitized_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
@@ -72,7 +77,7 @@ def get_customer(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/update", methods=["POST"])
+@app.route("/customer/<customer_id>", methods=["PATCH"])
 def update_customer(customer_id: str):
     try:
         sanitized_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
@@ -99,7 +104,7 @@ def update_customer(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/delete", methods=["GET"])
+@app.route("/customer/<customer_id>", methods=["DELETE"])
 def delete_customer(customer_id: str):
     try:
         sanitized_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
@@ -117,7 +122,7 @@ def delete_customer(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/create", methods=["POST"])
+@app.route("/customer/<customer_id>/accounts", methods=["POST"])
 def create_customer_account(customer_id: str):
     try:
         account_data: dict = request.get_json()
@@ -142,7 +147,7 @@ def create_customer_account(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/<account_id>/info", methods=["GET"])
+@app.route("/customer/<customer_id>/accounts/<account_id>", methods=["GET"])
 def get_customer_account(account_id: str, customer_id: str):
     try:
         sanitized_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)
@@ -167,7 +172,7 @@ def get_customer_account(account_id: str, customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/info", methods=["GET"])
+@app.route("/customer/<customer_id>/accounts", methods=["GET"])
 def get_all_customer_accounts(customer_id: str):
     try:
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
@@ -197,7 +202,7 @@ def get_all_customer_accounts(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/transfer/", methods=["POST"])
+@app.route("/customer/<customer_id>/accounts", methods=["PATCH"])
 def transfer_funds_between_accounts(customer_id: str):
     try:
         account_data: dict = request.get_json()
@@ -238,11 +243,11 @@ def transfer_funds_between_accounts(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/withdraw", methods=["POST"])
-def withdraw_funds_from_account_by_id(customer_id: str):
+@app.route("/customer/<customer_id>/accounts/<account_id>", methods=["PATCH"])
+def withdraw_funds_from_account_by_id(customer_id: str, account_id: str):
     try:
         account_data: dict = request.get_json()
-        from_account_id = account_data["fromAccount"]
+        from_account_id = account_id
         amount_to_withdraw = account_data["amountToWithdraw"]
         sanitized_from_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(from_account_id)
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
@@ -306,7 +311,7 @@ def deposit_funds_to_account_by_id(customer_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/<account_id>/delete", methods=["GET"])
+@app.route("/customer/<customer_id>/accounts/<account_id>", methods=["DELETE"])
 def delete_customer_account(customer_id: str, account_id: str):
     try:
         account_to_delete = customer_service_layer_object.sl_check_for_int_convertible_arg(account_id)

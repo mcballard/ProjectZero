@@ -107,19 +107,3 @@ def test_check_for_float_convertible_is_non_convertible():
         assert False
     except IncorrectDataField as e:
         assert str(e) == "The input from the api is not convertible to float."
-
-"""
-def test_delete_customer_by_id_record_not_found():
-    try:
-        return_value = test_customer_object.sl_delete_customer_by_id(1000)
-        assert False
-    except RecordNotFound as e:
-        assert str(e) == "Customer record not found."
-
-
-looking for connection errors in database
-
-
-def test_catch_operational_error_with_connect_object():
-    test_customer_object.customer_dao.create_customer = MagicMock(return_value=)
-"""
