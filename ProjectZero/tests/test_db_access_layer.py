@@ -4,7 +4,7 @@ from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
 from data_layer.dao_package.db_access_for_data_layer import create_table_row_entry, select_table_record, \
-    select_all_table_records_by_id, update_table_record, delete_table_record
+    select_all_table_records_by_id, update_table_record, delete_table_record, truncate_tables
 from custom_exceptions.database_error import DatabaseError
 
 test_customer = Customer(0, "Matt", "Ballard")
@@ -64,3 +64,6 @@ def test_select_all_records_no_records(mock):
     except RecordNotFound as e:
         assert str(e) == "No records found."
 
+
+def test_truncate_tables():
+    assert truncate_tables() != 0

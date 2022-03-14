@@ -140,3 +140,13 @@ def delete_table_record(object_id, table_to_access):
             return True
     else:
         raise RecordNotFound("Could not find record in database.")
+
+
+# quick reset for tables for testing purposes
+def truncate_tables():
+    sql_query = "truncate accounts, customers restart identity cascade"
+    cursor = connection.cursor()
+    cursor.execute(sql_query)
+    rows_removed = cursor.rowcount
+    connection.commit()
+    return rows_removed

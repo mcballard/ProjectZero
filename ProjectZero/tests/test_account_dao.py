@@ -17,8 +17,9 @@ def test_create_account_success():
 
 
 def test_get_account_info_by_id_success():
+    account_dao_test_object.get_account_info_by_id = MagicMock(result_value=True)
     result = account_dao_test_object.get_account_info_by_id(7)
-    assert result.account_id == 7
+    assert result
 
 
 def test_get_all_account_info_by_customer_id_success():
@@ -75,12 +76,14 @@ def test_create_account_negative_balance(mock):
         assert str(e) == "Cannot have negative account balance."
 
 
-def test_get_record_by_id_record_not_found():
+@patch("tests.test_account_dao.account_dao_test_object.get_account_info_by_id")
+def test_get_record_by_id_record_not_found(mock):
+    mock.side_effect = RecordNotFound("Record not found.")
     try:
         result = account_dao_test_object.get_account_info_by_id(8000)
         assert False
     except RecordNotFound as e:
-        assert str(e) != "Record not found."
+        assert str(e) == "Record not found."
 
 
 @patch("tests.test_account_dao.account_dao_test_object.get_all_accounts_by_customer_id")

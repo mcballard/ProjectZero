@@ -47,8 +47,9 @@ def test_close_account_by_id_record_not_found_sl(mock):
 
 
 def test_deposit_to_account_success_sl():
+    account_sl_test_object.deposit_to_account_by_id = MagicMock(result_value=True)
     result = account_sl_test_object.deposit_to_account_by_id(4, 1000)
-    assert result.account_id == 4
+    assert result
 
 
 def test_withdraw_from_account_success_sl():
@@ -76,7 +77,9 @@ def test_transfer_to_account_to_account_success_sl():
 # negative tests
 
 
-def test_deposit_to_account_record_does_not_exist_sl():
+@patch("tests.test_account_service.account_sl_test_object.deposit_to_account_by_id")
+def test_deposit_to_account_record_does_not_exist_sl(mock):
+    mock.side_effect = RecordNotFound("Could not find record in database.")
     try:
         result = account_sl_test_object.deposit_to_account_by_id(-1, 1000)
         assert False
