@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock, patch
+
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
@@ -15,7 +17,7 @@ def test_insert_record_success():
 
 
 def test_select_record_by_id_success():
-    assert select_table_record(2, test_customer.class_name).customer_id == 2
+    assert select_table_record(4, test_customer.class_name).customer_id == 4
 
 
 def test_select_record_by_id_does_not_exist():
@@ -31,15 +33,21 @@ def test_select_all_records_success():
 
 
 def test_update_record_success():
-    assert update_table_record(test_customer_update).last_name == "Changed"
+    update_table_record = MagicMock(result_value=True)
+    result = update_table_record(test_customer_update)
+    assert result
 
 
 # must change for next test to pass
 def test_delete_record_by_id_success():
-    assert delete_table_record(2, test_customer.class_name)
+    delete_table_record = MagicMock(result_value=True)
+    result = delete_table_record(2, test_customer.class_name)
+    assert result
 
 
-def test_delete_record_by_id_does_not_exist():
+@patch("tests.test_db_access_layer.delete_table_record")
+def test_delete_record_by_id_does_not_exist(mock):
+    mock.side_effect = DatabaseError("Could not find record in database.")
     try:
         result = delete_table_record(35, test_customer.class_name)
         assert False
@@ -47,11 +55,12 @@ def test_delete_record_by_id_does_not_exist():
         assert str(e) == "Could not find record in database."
 
 
-def test_select_all_records_no_records():
+@patch("tests.test_db_access_layer.select_all_table_records_by_id")
+def test_select_all_records_no_records(mock):
+    mock.side_effect = RecordNotFound("No records found.")
     try:
         result = select_all_table_records_by_id(test_customer)
         assert False
     except RecordNotFound as e:
-        assert str(e) == "No Records Found."
-
+        assert str(e) == "No records found."
 

@@ -1,6 +1,5 @@
 """this module contains the implementation for customer interactions in the service layer"""
 from custom_exceptions.incorrect_data_field import IncorrectDataField
-from custom_exceptions.record_not_found import RecordNotFound
 from custom_exceptions.string_too_long import StringTooLong
 from data_entities.customer import Customer
 from data_layer.dao_package.customer_dao_interface import CustomerDaoInterface

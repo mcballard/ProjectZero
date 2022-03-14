@@ -278,8 +278,6 @@ def deposit_funds_to_account_by_id(customer_id: str):
         account_data: dict = request.get_json()
         to_account_id = account_data["toAccount"]
         amount_to_deposit = account_data["amountToDeposit"]
-        # currently allow for transfer to and deposit from other customer accounts than current customer
-        # this path variable goes unused for this reason but is sanitized here so i dont forget if i change that later
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
         sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_deposit)
@@ -371,11 +369,5 @@ def leave_bank_customer_id(customer_id: str):
         }
         return jsonify(message), 400
 
-"""
-@app.route("/customer/<customer_id>/accounts/update", methods=["POST"])
-def update_customer_account():
-    pass
-
-"""
 
 app.run()

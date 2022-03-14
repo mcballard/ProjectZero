@@ -1,4 +1,5 @@
 from psycopg.errors import InFailedSqlTransaction
+from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
@@ -43,6 +44,7 @@ def select_table_record(object_unique_id: int, table_to_access: str):
         sql_query = f"select * from {table_to_access} where account_id = %s"
     else:
         sql_query = ""
+        raise IncorrectDataField("Unexpected object used.")
     cursor = connection.cursor()
     # list for single value customer_id tuple for multiple customer_id
     cursor.execute(sql_query, [object_unique_id])
@@ -66,6 +68,7 @@ def select_all_table_records_by_id(table_row_object):
         sql_query = f"select * from {table_row_object.class_name} where customer_id = {table_row_object.customer_id}"
     else:
         sql_query = ""
+        raise IncorrectDataField("Unexpected object used.")
     cursor = connection.cursor()
     cursor.execute(sql_query)
     result_object_records = cursor.fetchall()
