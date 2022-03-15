@@ -1,4 +1,3 @@
-from psycopg.errors import InFailedSqlTransaction
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
@@ -73,7 +72,7 @@ def select_all_table_records_by_id(table_row_object):
     cursor.execute(sql_query)
     result_object_records = cursor.fetchall()
     object_list = []
-    if type(object_list) is not None:
+    if len(result_object_records) != 0:
         if table_row_object.class_name == "customers":
             for record in result_object_records:
                 customer_record = Customer(*record)

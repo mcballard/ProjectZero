@@ -61,7 +61,7 @@ def test_get_all_records_by_id_no_records_found():
     try:
         result = account_dao_test_object.get_all_accounts_by_customer_id(1000)
     except RecordNotFound as e:
-        assert str(e) == "No accounts for this customer found."
+        assert str(e) == "No records found."
 
 
 def test_delete_record_by_id_record_not_found():
