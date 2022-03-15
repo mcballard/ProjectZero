@@ -77,7 +77,8 @@ class AccountSlImp(AccountSlInterface):
             account_to_change = self.account_dao.get_account_info_by_id(account_id)
             updated_account = self.account_dao.update_account_by_id(account_to_change.account_id, amount_to_change)
             return updated_account
-        raise RecordNotFound("Account not found.")
+        else:
+            raise RecordNotFound("Account not found.")
 
     def withdraw_from_account_by_id(self, account_id: int, customer_id, amount_to_change: float) -> Account:
         if amount_to_change >= 0:
@@ -90,7 +91,8 @@ class AccountSlImp(AccountSlInterface):
                 account_to_change = self.account_dao.get_account_info_by_id(account_id)
                 updated_account = self.account_dao.update_account_by_id(account_to_change.account_id, -amount_to_change)
                 return updated_account
-        raise IncorrectDataField("Cannot withdraw a negative amount.")
+        else:
+            raise IncorrectDataField("Cannot withdraw a negative amount.")
 
     def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
         returned_accounts = []

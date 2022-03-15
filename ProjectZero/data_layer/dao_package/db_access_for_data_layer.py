@@ -127,19 +127,18 @@ def delete_table_record(object_id, table_to_access):
         connection.commit()
         if result == 1:
             return True
+        else:
+            raise RecordNotFound("Could not find record in database.")
     elif table_to_access == "accounts":
-        try:
-            sql_query = f"delete from {table_to_access} where account_id=%s"
-            cursor = connection.cursor()
-            cursor.execute(sql_query, [object_id])
-        except InFailedSqlTransaction as e:
-            return str(e)
+        sql_query = f"delete from {table_to_access} where account_id=%s"
+        cursor = connection.cursor()
+        cursor.execute(sql_query, [object_id])
         result = cursor.rowcount
         connection.commit()
         if result == 1:
             return True
-    else:
-        raise RecordNotFound("Could not find record in database.")
+        else:
+            raise RecordNotFound("Could not find record in database.")
 
 
 # quick reset for tables for testing purposes

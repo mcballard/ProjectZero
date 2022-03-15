@@ -1,8 +1,6 @@
 """this module will contain the rest functionality for the project"""
 from ast import literal_eval
-
 from flask import Flask, request, jsonify
-
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
@@ -277,11 +275,11 @@ def withdraw_funds_from_account_by_id(customer_id: str, account_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/accounts/deposit", methods=["POST"])
-def deposit_funds_to_account_by_id(customer_id: str):
+@app.route("/customer/<customer_id>/accounts/<account_id>", methods=["POST"])
+def deposit_funds_to_account_by_id(customer_id: str, account_id: str):
     try:
         account_data: dict = request.get_json()
-        to_account_id = account_data["toAccount"]
+        to_account_id = account_id
         amount_to_deposit = account_data["amountToDeposit"]
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
@@ -343,7 +341,7 @@ def delete_customer_account(customer_id: str, account_id: str):
         return jsonify(message), 400
 
 
-@app.route("/customer/<customer_id>/leave", methods=["GET"])
+@app.route("/customer/<customer_id>", methods=["POST"])
 def leave_bank_customer_id(customer_id: str):
     try:
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)

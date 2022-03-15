@@ -1,6 +1,5 @@
 """this module contains testing for the service layer account interactions"""
 from unittest.mock import patch, MagicMock
-
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
@@ -75,13 +74,11 @@ def test_transfer_to_account_to_account_success_sl():
 
 
 # negative tests
-
-
 @patch("tests.test_account_service.account_sl_test_object.deposit_to_account_by_id")
 def test_deposit_to_account_record_does_not_exist_sl(mock):
     mock.side_effect = RecordNotFound("Could not find record in database.")
     try:
-        result = account_sl_test_object.deposit_to_account_by_id(-1, 1000)
+        result = account_sl_test_object.deposit_to_account_by_id(2, 1000)
         assert False
     except RecordNotFound as e:
         assert str(e) == "Could not find record in database."
@@ -91,7 +88,7 @@ def test_deposit_to_account_record_does_not_exist_sl(mock):
 def test_withdraw_from_account_customer_id_mismatch(mock):
     mock.side_effect = CustomerIdMismatch("You cannot withdraw from another customer's account.")
     try:
-        result = account_sl_test_object.withdraw_from_account_by_id(1, 2, 0)
+        result = account_sl_test_object.withdraw_from_account_by_id(7, 1, 10)
         assert False
     except CustomerIdMismatch as e:
         assert str(e) == "You cannot withdraw from another customer's account."
@@ -125,9 +122,9 @@ def test_create_account_non_number_balance_sl():
 def test_transfer_negative_balance_sl(mock):
     mock.side_effect = NegativeBalance("You cannot overdraw your account.")
     try:
-        test_account_1 = Account(1, 1, 899.5)
-        test_account_2 = Account(2, 1, 100)
-        result = account_sl_test_object.transfer_to_account(test_account_1, test_account_2, 30000)
+        test_account1 = Account(7, 4, 15000)
+        test_account2 = Account(8, 4, 15000)
+        result = account_sl_test_object.transfer_to_account(test_account1, test_account2, 30000)
         assert False
     except NegativeBalance as e:
         assert str(e) == "You cannot overdraw your account."
@@ -137,7 +134,7 @@ def test_transfer_negative_balance_sl(mock):
 def test_withdraw_negative_balance_sl(mock):
     mock.side_effect = NegativeBalance("You do not have sufficient funds.")
     try:
-        result = account_sl_test_object.withdraw_from_account_by_id(12, 2, 30000)
+        result = account_sl_test_object.withdraw_from_account_by_id(7, 4, 30000)
         assert False
     except NegativeBalance as e:
         assert str(e) == "You do not have sufficient funds."
@@ -147,7 +144,7 @@ def test_withdraw_negative_balance_sl(mock):
 def test_withdraw_a_negative_amount(mock):
     mock.side_effect = IncorrectDataField("Cannot withdraw a negative amount.")
     try:
-        result = account_sl_test_object.withdraw_from_account_by_id(37, 2, -5000)
+        result = account_sl_test_object.withdraw_from_account_by_id(7, 4, -5000)
         assert False
     except IncorrectDataField as e:
         assert str(e) == "Cannot withdraw a negative amount."
