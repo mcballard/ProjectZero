@@ -1,6 +1,8 @@
 """this module will contain the rest functionality for the project"""
 from ast import literal_eval
 from flask import Flask, request, jsonify
+
+from custom_exceptions.corrupt_transaction_db import CorruptedTransactionAborted
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
@@ -239,6 +241,10 @@ def transfer_funds_between_accounts(customer_id: str):
             "message": str(e)
         }
         return jsonify(message), 400
+    except CorruptedTransactionAborted as e:
+        message = {
+            "message": str(e)
+        }
 
 
 @app.route("/customer/<customer_id>/accounts/<account_id>", methods=["PATCH"])

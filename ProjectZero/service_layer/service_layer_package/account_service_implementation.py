@@ -95,12 +95,12 @@ class AccountSlImp(AccountSlInterface):
             raise IncorrectDataField("Cannot withdraw a negative amount.")
 
     def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
-        returned_accounts = []
-        if from_account.account_balance.__lt__(amount_to_transfer):
+        customer_id_check = self.account_dao.get_account_info_by_id(from_account.account_id)
+        if customer_id_check.customer_id != from_account.customer_id:
+            raise CustomerIdMismatch("You cannot withdraw from another customer's account.")
+        elif amount_to_transfer < 0:
+            raise IncorrectDataField("Cannot withdraw a negative amount.")
+        elif from_account.account_balance.__lt__(amount_to_transfer):
             raise NegativeBalance("You cannot overdraw your account.")
         else:
-            withdrawn_account = self.withdraw_from_account_by_id(from_account.account_id, from_account.customer_id, amount_to_transfer)
-            returned_accounts.append(withdrawn_account)
-            deposited_account = self.deposit_to_account_by_id(to_account.account_id, amount_to_transfer)
-            returned_accounts.append(deposited_account)
-        return returned_accounts
+            return self.account_dao.transfer_to_account(from_account, to_account, amount_to_transfer)

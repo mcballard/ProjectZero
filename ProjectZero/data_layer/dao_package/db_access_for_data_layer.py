@@ -1,3 +1,4 @@
+from custom_exceptions.corrupt_transaction_db import CorruptedTransactionAborted
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
@@ -115,6 +116,27 @@ def update_table_record(table_row_object):
                 raise RecordNotFound("Could not find record in database.")
     except DatabaseError as e:
         raise DatabaseError(str(e))
+
+
+def update_multiple_related_records(first_record: Account, second_record: Account) -> []:
+    sql_query = "update "+first_record.class_name+" set account_balance = case when account_id=%s then %s " \
+                                                  "when account_id=%s then %s end where account_id in(%s, %s) " \
+                                                  "returning account_id, customer_id, account_balance;"
+    cursor = connection.cursor()
+    cursor.execute(sql_query, (first_record.account_id, first_record.account_balance,
+                               second_record.account_id, second_record.account_balance, first_record.account_id, second_record.account_id))
+    result_object_records = cursor.fetchall()
+    result_count = cursor.rowcount
+    object_list = []
+    if len(result_object_records) == 2 and result_count == 2:
+        connection.commit()
+        for record in result_object_records:
+            account_record = Account(*record)
+            object_list.append(account_record)
+        return object_list
+    else:
+        connection.rollback()
+        raise CorruptedTransactionAborted("The transfer could not be completed.")
 
 
 def delete_table_record(object_id, table_to_access):

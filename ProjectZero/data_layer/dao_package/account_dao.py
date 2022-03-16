@@ -3,7 +3,8 @@ from custom_exceptions.negative_balance import NegativeBalance
 from data_entities.account import Account
 from data_layer.dao_package.account_DAO_interface import AccountDaoInterface
 from data_layer.dao_package.db_access_for_data_layer import create_table_row_entry, \
-    select_table_record, select_all_table_records_by_id, update_table_record, delete_table_record
+    select_table_record, select_all_table_records_by_id, update_table_record, delete_table_record, \
+    update_multiple_related_records
 
 
 class AccountDao(AccountDaoInterface):
@@ -32,3 +33,8 @@ class AccountDao(AccountDaoInterface):
 
     def delete_account_by_id(self, account_id: int) -> bool:
         return delete_table_record(account_id, self.class_name)
+
+    def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
+        from_account.account_balance -= amount_to_transfer
+        to_account.account_balance += amount_to_transfer
+        return update_multiple_related_records(from_account, to_account)

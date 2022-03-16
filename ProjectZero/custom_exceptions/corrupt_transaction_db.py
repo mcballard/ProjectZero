@@ -1,0 +1,3 @@
+
+class CorruptedTransactionAborted(Exception):
+    pass

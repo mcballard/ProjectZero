@@ -26,7 +26,9 @@ class AccountDaoInterface(ABC):
     def delete_account_by_id(self, account_id: int) -> bool:
         pass
 
-
+    @abstractmethod
+    def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
+        pass
 
 """
     @abstractmethod
@@ -37,7 +39,4 @@ class AccountDaoInterface(ABC):
     def withdraw_from_account(self, account: Account, amount_to_withdraw: float) -> Account:
         pass
 
-    @abstractmethod
-    def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
-        pass
 """
