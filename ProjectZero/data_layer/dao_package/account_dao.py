@@ -1,4 +1,6 @@
 """this module contains data access for account object"""
+import decimal
+
 from custom_exceptions.negative_balance import NegativeBalance
 from data_entities.account import Account
 from data_layer.dao_package.account_DAO_interface import AccountDaoInterface
@@ -28,13 +30,13 @@ class AccountDao(AccountDaoInterface):
 
     def update_account_by_id(self, account_id: int, balance_change: float) -> Account:
         account_update_info: Account = select_table_record(account_id, self.class_name)
-        account_update_info.account_balance += balance_change
+        account_update_info.account_balance += decimal.Decimal(float(balance_change))
         return update_table_record(account_update_info)
 
     def delete_account_by_id(self, account_id: int) -> bool:
         return delete_table_record(account_id, self.class_name)
 
     def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
-        from_account.account_balance -= amount_to_transfer
-        to_account.account_balance += amount_to_transfer
+        from_account.account_balance -= decimal.Decimal(float(amount_to_transfer))
+        to_account.account_balance += decimal.Decimal(float(amount_to_transfer))
         return update_multiple_related_records(from_account, to_account)

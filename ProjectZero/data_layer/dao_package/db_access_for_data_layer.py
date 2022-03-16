@@ -119,8 +119,10 @@ def update_table_record(table_row_object):
 
 
 def update_multiple_related_records(first_record: Account, second_record: Account) -> []:
-    sql_query = "update "+first_record.class_name+" set account_balance = case when account_id=%s then %s " \
-                                                  "when account_id=%s then %s end where account_id in(%s, %s) " \
+    sql_query = "update "+first_record.class_name+" set account_balance = case " \
+                                                  "when account_id=%s then %s " \
+                                                  "when account_id=%s then %s end " \
+                                                  "where account_id in(%s, %s) " \
                                                   "returning account_id, customer_id, account_balance;"
     cursor = connection.cursor()
     cursor.execute(sql_query, (first_record.account_id, first_record.account_balance,

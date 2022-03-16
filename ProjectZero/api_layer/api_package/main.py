@@ -245,6 +245,7 @@ def transfer_funds_between_accounts(customer_id: str):
         message = {
             "message": str(e)
         }
+        return jsonify(message)
 
 
 @app.route("/customer/<customer_id>/accounts/<account_id>", methods=["PATCH"])

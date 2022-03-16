@@ -1,5 +1,6 @@
 """this module contains the implementation of the service level account interactions"""
 import operator
+from decimal import Decimal
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance

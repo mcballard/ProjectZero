@@ -21,5 +21,5 @@ class Account:
         return {
             "accountId": self.account_id,
             "customerId": self.customer_id,
-            "accountBalance": self.account_balance
+            "accountBalance": float(self.account_balance)
         }
