@@ -11,7 +11,7 @@ class Customer:
         self.customer_id = customer_id
         self.first_name = first_name
         self.last_name = last_name
-        self.class_name = "customers"
+        self.table_name = "customers"
 
     def __str__(self):
         return f"customer_id = {self.customer_id}, first_name = {self.first_name}, last_name = {self.last_name}"

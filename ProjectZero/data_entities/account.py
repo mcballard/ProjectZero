@@ -12,7 +12,7 @@ class Account:
         self.account_id = account_id
         self.customer_id = customer_id
         self.account_balance = account_balance
-        self.class_name = "accounts"
+        self.table_name = "accounts"
 
     def __str__(self):
         return f"customer_id = {self.account_id}, first_name = {self.customer_id}, last_name = {self.account_balance}"
