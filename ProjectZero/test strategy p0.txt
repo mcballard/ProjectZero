@@ -1,0 +1,30 @@
+test strategy p0
+	bug reporting:
+		create document describing bug and its location
+		project, package, module and line in module
+
+		comment in code at location of bug with reference 
+		to document or ticket location
+	
+	api endpoints:
+		Customer acctions:
+			/customer
+			/customer/<customer_id>
+		Customer actions on accounts:
+			/customer/<customer_id>/accounts
+			/customer/<customer_id>/accounts/<account_id>
+
+	best practices:
+		spell out full words when naming items in code and ide
+		to allow for readibility
+
+	bug fix workflow:
+		ensure all bug reports are submitted to bug folder before
+		reporting via email or message
+
+		ensure all bug fixes are submitted to repo for testing before 
+		reporting the fix via email or message
+		
+		ensure successful test results are submitted to repo before reporting
+		bug resolution vie email or message
+		
