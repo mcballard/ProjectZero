@@ -1,0 +1,90 @@
+test plan p0:
+	deadlines: (10 days)
+		2 day per setting up tests and interfaces for data layer
+		2 day implement data layer
+		2 day per test and interface for service layer
+		2 day implement service layer
+		1 day tests and endpoints for api
+		1 day implement api layer
+
+	technologies used:
+		python:
+			pycharm
+			pyscopg2 : pip install psycopg[binary]
+			flask : pip install flask
+			pytest : pip install pytest
+		postman
+		aws postgresql database (rds and ec2)
+		dbeaver
+		github/gitbash
+
+	test suites:
+		tier design:
+			data_layer suite
+				customer: one positive and one negative for each at a minimum
+					create
+					select
+					update
+					delete
+				account: one positive and one negative for each at a minimum
+					create
+					select
+					update
+					delete
+			service_layer suite
+				customer: one positive and one negative for each at a minimum
+					name not null check : may or may not need to test based on db design or
+						sanitation before request or at request in api
+					sanitize input checks
+						may or may not check (selecting customer info not explicitly required)
+					no record found for customer id
+					customer last/first name too long
+					first/last non string
+					check unique id on creation
+					leave bank/close all accounts
+						customer does not exist
+						no accounts
+						may or may not check for withdraw cash for closed accounts (not explicit requirement)
+				account: one positive and one negative for each at a minimum
+					sanitize input checks
+						invalid customer or account id
+							string is convertible
+							non convertible to int
+					balance constraint not negative
+						cannot overdraw
+					transfer
+						overdraw
+						correct customer id
+						test update account reflects the new balances for each account
+					deposit/withdraw
+						cannot withdraw negative number
+						cannot withdraw from other customer account
+					catching errors
+						account not found
+						customer id mismatch
+						transfer between accounts fails at database and rollback is achieved
+					input constraints (i.e. negative balance)
+			api
+				postman : collection: one positive and one negative for each at a minimum
+					proper requests received
+						individual requests for all customer interactions, including testing
+							for bad requests (i.e. name strings too long) are caught and handled properly
+							by api sending a descriptive message in body of response
+					proper responses prepared
+							ensure all repsonse are properly formatted in JSON
+
+	test results:
+
+		printed to file in repo for pytest tests:
+			each module individually during each phase in deadline structure
+			all together
+
+			annotate spreadsheet for bug/fix tracking
+
+		postman: 
+			collection in runner
+				save to file if possible
+
+			annotate spreadsheet for bug/fix tracking
+		
+		

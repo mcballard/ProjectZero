@@ -5,8 +5,13 @@ test strategy p0
 
 		comment in code at location of bug with reference 
 		to document or ticket location
+
+		use a spreadsheet to list all bugs and who reported, is working on,
+		severity of bug
 	
 	api endpoints:
+		RESTful
+		use flask
 		Customer acctions:
 			/customer
 			/customer/<customer_id>
@@ -17,14 +22,26 @@ test strategy p0
 	best practices:
 		spell out full words when naming items in code and ide
 		to allow for readibility
+		
+		one positive test, one negative test
+		
+		descriptive error messages
+
+		take short breaks periodically throughout your day.
 
 	bug fix workflow:
 		ensure all bug reports are submitted to bug folder before
-		reporting via email or message
+		reporting via email or message or updated on spreadsheet
+			-ideally different branches for bugs and fixes in repo
+
+		ideal fix time for bugs:
+			critical : 1 day or less
+			medium : 3 days
+			low : 1 week
 
 		ensure all bug fixes are submitted to repo for testing before 
-		reporting the fix via email or message
+		reporting the fix via email or message or updated on spreadsheet
 		
 		ensure successful test results are submitted to repo before reporting
-		bug resolution vie email or message
+		bug resolution vie email or message or updated on spreadsheet
 		
