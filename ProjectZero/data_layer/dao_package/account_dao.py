@@ -39,4 +39,5 @@ class AccountDao(AccountDaoInterface):
     def transfer_to_account(self, from_account: Account, to_account: Account, amount_to_transfer: float) -> []:
         from_account.account_balance -= decimal.Decimal(float(amount_to_transfer))
         to_account.account_balance += decimal.Decimal(float(amount_to_transfer))
-        return db_access_object.update_multiple_related_records(from_account, to_account)
+        accounts_list = [from_account, to_account]
+        return db_access_object.update_multiple_related_records(accounts_list)

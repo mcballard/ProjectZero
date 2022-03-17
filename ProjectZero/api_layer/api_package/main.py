@@ -1,7 +1,6 @@
 """this module will contain the rest functionality for the project"""
 from ast import literal_eval
 from flask import Flask, request, jsonify
-
 from custom_exceptions.corrupt_transaction_db import CorruptedTransactionAborted
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
@@ -109,7 +108,10 @@ def delete_customer(customer_id: str):
     try:
         sanitized_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         customer_deleted_bool = customer_service_layer_object.sl_delete_customer_by_id(sanitized_id)
-        return "Customer record removed is " + str(customer_deleted_bool), 200
+        message = {
+            "message": "Customer record removed is " + str(customer_deleted_bool) + "."
+        }
+        return jsonify(message), 200
     except IncorrectDataField as e:
         message = {
             "message": str(e)
@@ -217,8 +219,10 @@ def transfer_funds_between_accounts(customer_id: str):
         to_account = accounts_service_layer_object.sl_get_account_info_by_id(sanitized_to_account_id, sanitized_customer_id)
         transferred_accounts = accounts_service_layer_object.transfer_to_account(from_account, to_account, sanitized_amount_to_transfer)
         accounts_dictionary = {
-                                "accountFrom": {"accountId": transferred_accounts[0].account_id, "newBalance": transferred_accounts[0].account_balance},
-                                "accountTo": {"accountId": transferred_accounts[1].account_id, "newBalance": transferred_accounts[1].account_balance}
+                                "accountFrom": {"accountId": transferred_accounts[0].account_id,
+                                                "newBalance": transferred_accounts[0].account_balance},
+                                "accountTo": {"accountId": transferred_accounts[1].account_id,
+                                              "newBalance": transferred_accounts[1].account_balance}
                               }
         return jsonify(accounts_dictionary), 200
     except IncorrectDataField as e:
@@ -245,7 +249,7 @@ def transfer_funds_between_accounts(customer_id: str):
         message = {
             "message": str(e)
         }
-        return jsonify(message)
+        return jsonify(message), 400
 
 
 @app.route("/customer/<customer_id>/accounts/<account_id>", methods=["PATCH"])
@@ -288,6 +292,7 @@ def deposit_funds_to_account_by_id(customer_id: str, account_id: str):
         account_data: dict = request.get_json()
         to_account_id = account_id
         amount_to_deposit = account_data["amountToDeposit"]
+        # check to confirm existing customer and id is proper format
         sanitized_customer_id = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         sanitized_to_account_id = customer_service_layer_object.sl_check_for_int_convertible_arg(to_account_id)
         sanitized_amount_to_transfer = customer_service_layer_object.sl_check_for_float_convertible_arg(amount_to_deposit)
@@ -323,9 +328,15 @@ def delete_customer_account(customer_id: str, account_id: str):
         customer_for_account = customer_service_layer_object.sl_check_for_int_convertible_arg(customer_id)
         account_delete_response = accounts_service_layer_object.sl_close_account_by_id(account_to_delete, customer_for_account)
         if account_delete_response:
-            return "Your account was successfully closed."
+            message = {
+                "message": "Your account was successfully closed."
+            }
+            return jsonify(message), 200
         else:
-            return "Unable to locate account."
+            message = {
+                "message": "Unable to locate account."
+            }
+            return jsonify(message), 400
     except IncorrectDataField as e:
         message = {
             "message": str(e)

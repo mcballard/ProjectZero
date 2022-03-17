@@ -44,15 +44,17 @@ def test_delete_record_by_id_success():
 def test_transfer_success():
     account1 = Account(7, 4, 14000)
     account2 = Account(8, 4, 16000)
-    result = test_db_access_object.update_multiple_related_records(account1, account2)
+    test_list = [account1, account2]
+    result = test_db_access_object.update_multiple_related_records(test_list)
     assert result[0].account_balance == 14000
 
 
 def test_transfer_failure():
     incorrect_account_info = Account(8, 4, 15000)
     incorrect_account_info2 = Account(-1, 4, 15000)
+    test_list = [incorrect_account_info, incorrect_account_info2]
     try:
-        result = test_db_access_object.update_multiple_related_records(incorrect_account_info, incorrect_account_info2)
+        result = test_db_access_object.update_multiple_related_records(test_list)
         assert False
     except CorruptedTransactionAborted as e:
         assert str(e) == "The transfer could not be completed."

@@ -39,7 +39,6 @@ class DBAccessObject:
                 new_account_object = Account(*new_object)
                 return new_account_object
 
-
     def select_table_record(self, object_unique_id: int, table_to_access: str):
         # select does not need a commit as it is read only
         # connection will close after function returns value
@@ -65,7 +64,6 @@ class DBAccessObject:
                 result_account_object = Account(*result_object)
                 return result_account_object
 
-
     def select_all_table_records_by_id(self, table_row_object):
         if table_row_object.table_name == "customers":
             sql_query = f"select * from {table_row_object.table_name} where customer_id = {table_row_object.customer_id}"
@@ -90,7 +88,6 @@ class DBAccessObject:
                     object_list.append(account_record)
                 return object_list
         raise RecordNotFound("No records found.")
-
 
     def update_table_record(self, table_row_object):
         try:
@@ -123,21 +120,41 @@ class DBAccessObject:
         except DatabaseError as e:
             raise DatabaseError(str(e))
 
-
-    def update_multiple_related_records(self, first_record: Account, second_record: Account) -> []:
-        sql_query = "update "+first_record.table_name+" set account_balance = case " \
-                                                      "when account_id=%s then %s " \
-                                                      "when account_id=%s then %s end " \
-                                                      "where account_id in(%s, %s) " \
-                                                      "returning account_id, customer_id, account_balance;"
+    def update_multiple_related_records(self, record_list: list[Account]) -> []:
+        # case statement for when account id is x then balance is y for account ids in a set
+        # could be scaled using paired ids to balances iterating through building the query
+        # explicitly instead of using the built-in %s placeholders
+        # with the technique used in scaling this method could be consolidated into the update single
+        # record method with some tweaking
+        comma_count = 0
+        too_many_commas = 0
+        for commas in record_list:
+            too_many_commas += 1
+        sql_query = f"update {record_list[0].table_name} set account_balance = case "
+        for record in record_list:
+            sql_query += f"when account_id={str(record.account_id)} then {str(record.account_balance)}"
+        sql_query += f" end where account_id in ("
+        for record in record_list:
+            comma_count += 1
+            sql_query += str(record.account_id)
+            if comma_count < too_many_commas:
+                sql_query += f","
+        sql_query += f") returning account_id, customer_id, account_balance;"
+        #sql_query = "update "+first_record.table_name+" set account_balance = case " \
+        #                                              "when account_id=%s then %s " \
+        #                                              "when account_id=%s then %s " \
+        #                                              "end " \
+        #                                              "where account_id in(%s, %s) " \
+        #                                              "returning account_id, customer_id, account_balance;"
         cursor = connection.cursor()
-        cursor.execute(sql_query, (first_record.account_id, first_record.account_balance,
-                                   second_record.account_id, second_record.account_balance,
-                                   first_record.account_id, second_record.account_id))
+        #cursor.execute(sql_query, (first_record.account_id, first_record.account_balance,
+        #                           second_record.account_id, second_record.account_balance,
+        #                           first_record.account_id, second_record.account_id))
+        cursor.execute(sql_query)
         result_object_records = cursor.fetchall()
         result_count = cursor.rowcount
         object_list = []
-        if len(result_object_records) == 2 and result_count == 2:
+        if len(result_object_records) == len(record_list) and result_count == len(record_list):
             connection.commit()
             for record in result_object_records:
                 account_record = Account(*record)
@@ -146,7 +163,6 @@ class DBAccessObject:
         else:
             connection.rollback()
             raise CorruptedTransactionAborted("The transfer could not be completed.")
-
 
     def delete_table_record(self, object_id, table_to_access):
         if table_to_access == "customers":

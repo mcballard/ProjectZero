@@ -1,6 +1,6 @@
 """this module contains the implementation of the service level account interactions"""
 import operator
-from decimal import Decimal
+
 from custom_exceptions.customer_id_mismatch import CustomerIdMismatch
 from custom_exceptions.incorrect_data_field import IncorrectDataField
 from custom_exceptions.negative_balance import NegativeBalance
@@ -53,7 +53,7 @@ class AccountSlImp(AccountSlInterface):
                 closed_account = self.withdraw_from_account_by_id(accounts.account_id, accounts.customer_id, amount_to_withdraw)
                 amount_withdrawn += amount_to_withdraw
                 is_record_removed = self.sl_delete_account_by_account_id(closed_account.account_id)
-        if is_record_removed and (amount_withdrawn != 0):
+        if is_record_removed:
             return True, amount_withdrawn
         else:
             raise RecordNotFound("No accounts closed.")

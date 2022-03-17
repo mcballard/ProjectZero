@@ -2,7 +2,7 @@ from psycopg import OperationalError, connect
 import os
 
 
-# import into data access layer
+# import into database access layer
 
 def create_connection():
     try:
