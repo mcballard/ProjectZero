@@ -23,7 +23,8 @@ class CustomerDao(CustomerDaoInterface):
 
     def update_customer(self, customer_id: int, first_name: str, last_name: str) -> Customer:
         customer_to_update = Customer(customer_id, first_name, last_name)
-        return db_access_object.update_table_record(customer_to_update)
+        customer_list = [customer_to_update]
+        return db_access_object.update_multiple_related_records(customer_list)
 
     def delete_customer_by_id(self, customer_id: int) -> bool:
         return db_access_object.delete_table_record(customer_id, self.table_name)

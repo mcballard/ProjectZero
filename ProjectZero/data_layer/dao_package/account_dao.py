@@ -31,7 +31,8 @@ class AccountDao(AccountDaoInterface):
     def update_account_by_id(self, account_id: int, balance_change: float) -> Account:
         account_update_info: Account = db_access_object.select_table_record(account_id, self.table_name)
         account_update_info.account_balance += decimal.Decimal(float(balance_change))
-        return db_access_object.update_table_record(account_update_info)
+        account_list = [account_update_info]
+        return db_access_object.update_multiple_related_records(account_list)[0]
 
     def delete_account_by_id(self, account_id: int) -> bool:
         return db_access_object.delete_table_record(account_id, self.table_name)

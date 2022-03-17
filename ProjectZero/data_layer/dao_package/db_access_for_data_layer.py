@@ -4,7 +4,6 @@ from custom_exceptions.record_not_found import RecordNotFound
 from data_entities.customer import Customer
 from data_entities.account import Account
 from data_layer.dao_package.manage_connections import connection
-from custom_exceptions.database_error import DatabaseError
 
 
 class DBAccessObject:
@@ -89,80 +88,55 @@ class DBAccessObject:
                 return object_list
         raise RecordNotFound("No records found.")
 
-    def update_table_record(self, table_row_object):
-        try:
-            if table_row_object.table_name == "customers":
-                sql_query = f"update {table_row_object.table_name} set first_name=%s, last_name=%s where customer_id=%s returning customer_id, first_name, last_name"
-                cursor = connection.cursor()
-                cursor.execute(sql_query, (table_row_object.first_name, table_row_object.last_name, table_row_object.customer_id))
-                connection.commit()
-                result_customer_tuple = cursor.fetchone()
-                result_rows = cursor.rowcount
-                if result_rows != 0:
-                    customer_object = Customer(*result_customer_tuple)
-                    return customer_object
-                else:
-                    raise RecordNotFound("Could not find record in database.")
-            elif table_row_object.table_name == "accounts":
-                sql_query = f"update {table_row_object.table_name} set account_balance=%s where account_id=%s " \
-                            f"returning account_id, customer_id, account_balance"
-                cursor = connection.cursor()
-                cursor.execute(sql_query,
-                               (table_row_object.account_balance, table_row_object.account_id))
-                connection.commit()
-                result_account_tuple = cursor.fetchone()
-                result_rows = cursor.rowcount
-                if result_rows != 0:
-                    account_object = Account(*result_account_tuple)
-                    return account_object
-                else:
-                    raise RecordNotFound("Could not find record in database.")
-        except DatabaseError as e:
-            raise DatabaseError(str(e))
-
-    def update_multiple_related_records(self, record_list: list[Account]) -> []:
-        # case statement for when account id is x then balance is y for account ids in a set
-        # could be scaled using paired ids to balances iterating through building the query
-        # explicitly instead of using the built-in %s placeholders
-        # with the technique used in scaling this method could be consolidated into the update single
-        # record method with some tweaking
-        comma_count = 0
-        too_many_commas = 0
-        for commas in record_list:
-            too_many_commas += 1
-        sql_query = f"update {record_list[0].table_name} set account_balance = case "
-        for record in record_list:
-            sql_query += f"when account_id={str(record.account_id)} then {str(record.account_balance)}"
-        sql_query += f" end where account_id in ("
-        for record in record_list:
-            comma_count += 1
-            sql_query += str(record.account_id)
-            if comma_count < too_many_commas:
-                sql_query += f","
-        sql_query += f") returning account_id, customer_id, account_balance;"
-        #sql_query = "update "+first_record.table_name+" set account_balance = case " \
-        #                                              "when account_id=%s then %s " \
-        #                                              "when account_id=%s then %s " \
-        #                                              "end " \
-        #                                              "where account_id in(%s, %s) " \
-        #                                              "returning account_id, customer_id, account_balance;"
-        cursor = connection.cursor()
-        #cursor.execute(sql_query, (first_record.account_id, first_record.account_balance,
-        #                           second_record.account_id, second_record.account_balance,
-        #                           first_record.account_id, second_record.account_id))
-        cursor.execute(sql_query)
-        result_object_records = cursor.fetchall()
-        result_count = cursor.rowcount
-        object_list = []
-        if len(result_object_records) == len(record_list) and result_count == len(record_list):
+    def update_multiple_related_records(self, record_list: []) -> []:
+        if record_list[0].table_name == "customers":
+            sql_query = f"update {record_list[0].table_name} set " \
+                        f"first_name=%s, " \
+                        f"last_name=%s " \
+                        f"where customer_id=%s " \
+                        f"returning customer_id, first_name, last_name"
+            cursor = connection.cursor()
+            cursor.execute(sql_query,
+                           (record_list[0].first_name,
+                            record_list[0].last_name,
+                            record_list[0].customer_id))
             connection.commit()
-            for record in result_object_records:
-                account_record = Account(*record)
-                object_list.append(account_record)
-            return object_list
-        else:
-            connection.rollback()
-            raise CorruptedTransactionAborted("The transfer could not be completed.")
+            result_customer_tuple = cursor.fetchone()
+            result_rows = cursor.rowcount
+            if result_rows != 0:
+                customer_object = Customer(*result_customer_tuple)
+                return customer_object
+            else:
+                raise RecordNotFound("Could not find record in database.")
+        elif record_list[0].table_name == "accounts":
+            comma_count = 0
+            too_many_commas = 0
+            for commas in record_list:
+                too_many_commas += 1
+            sql_query = f"update {record_list[0].table_name} set account_balance = case "
+            for record in record_list:
+                sql_query += f"when account_id={str(record.account_id)} then {str(record.account_balance)}"
+            sql_query += f" end where account_id in ("
+            for record in record_list:
+                comma_count += 1
+                sql_query += str(record.account_id)
+                if comma_count < too_many_commas:
+                    sql_query += f","
+            sql_query += f") returning account_id, customer_id, account_balance;"
+            cursor = connection.cursor()
+            cursor.execute(sql_query)
+            result_object_records = cursor.fetchall()
+            result_count = cursor.rowcount
+            object_list = []
+            if len(result_object_records) == len(record_list) and result_count == len(record_list):
+                connection.commit()
+                for record in result_object_records:
+                    account_record = Account(*record)
+                    object_list.append(account_record)
+                return object_list
+            else:
+                connection.rollback()
+                raise CorruptedTransactionAborted("The transfer could not be completed.")
 
     def delete_table_record(self, object_id, table_to_access):
         if table_to_access == "customers":

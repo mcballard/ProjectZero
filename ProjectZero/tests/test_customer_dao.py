@@ -29,13 +29,13 @@ def test_get_customer_by_id_record_not_found():
 
 
 def test_update_customer_first_name_success():
-    result = test_customer_object.update_customer(1, "matt", "last")
-    assert result
+    result = test_customer_object.update_customer(1, "math", "last")
+    assert result.first_name == "math"
 
 
 def test_update_customer_last_name_success():
-    result = test_customer_object.update_customer(1, "first", "bananas")
-    assert result
+    result = test_customer_object.update_customer(1, "first", "we shall see")
+    assert result.last_name == "we shall see"
 
 
 # will fail unless updated

@@ -32,7 +32,8 @@ def test_select_all_records_success():
 
 
 def test_update_record_success():
-    result = test_db_access_object.update_table_record(test_customer_update)
+    test_list = [test_customer_update]
+    result = test_db_access_object.update_multiple_related_records(test_list)
     assert result
 
 
@@ -76,6 +77,7 @@ def test_select_all_records_no_records():
     except RecordNotFound as e:
         assert str(e) == "No records found."
 
-
+"""
 def test_truncate_tables():
     assert test_db_access_object.truncate_tables() != 0
+"""
