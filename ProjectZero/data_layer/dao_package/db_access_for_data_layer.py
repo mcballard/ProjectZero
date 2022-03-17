@@ -110,9 +110,6 @@ class DBAccessObject:
                 raise RecordNotFound("Could not find record in database.")
         elif record_list[0].table_name == "accounts":
             comma_count = 0
-            too_many_commas = 0
-            for commas in record_list:
-                too_many_commas += 1
             sql_query = f"update {record_list[0].table_name} set account_balance = case "
             for record in record_list:
                 sql_query += f"when account_id={str(record.account_id)} then {str(record.account_balance)}"
@@ -120,7 +117,7 @@ class DBAccessObject:
             for record in record_list:
                 comma_count += 1
                 sql_query += str(record.account_id)
-                if comma_count < too_many_commas:
+                if len(record_list) > comma_count:
                     sql_query += f","
             sql_query += f") returning account_id, customer_id, account_balance;"
             cursor = connection.cursor()

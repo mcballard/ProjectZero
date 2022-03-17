@@ -77,7 +77,6 @@ def test_select_all_records_no_records():
     except RecordNotFound as e:
         assert str(e) == "No records found."
 
-"""
+
 def test_truncate_tables():
     assert test_db_access_object.truncate_tables() != 0
-"""
