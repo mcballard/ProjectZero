@@ -1,0 +1,2 @@
+class IncompleteColumnDictionary(Exception):
+    pass
