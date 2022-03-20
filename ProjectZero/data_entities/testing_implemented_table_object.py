@@ -1,4 +1,8 @@
+import re
+from ast import literal_eval
+
 from custom_exceptions.incomplete_column_dictionary import IncompleteColumnDictionary
+from custom_exceptions.incorrect_data_field import IncorrectDataField
 
 
 class TestRowObject:
@@ -12,14 +16,27 @@ class TestRowObject:
         # at a minimum a unique_id preferably a primary key relationship in the table and the name of the table
         # would be required, anything else is a business case and implementation should be handled as such
         self.object_specific_attributes_dictionary = row_columns_with_values
-        if self.object_specific_attributes_dictionary["table_name"] is None \
-                or self.object_specific_attributes_dictionary["unique_id"] is None:
-            raise IncompleteColumnDictionary("Dictionary defining minimum column requirements is incomplete.")
 
     def return_dictionary_for_json(self) -> dict:
         # return dictionary with proper table name and column names for specific implementations
         # with camelCase keys reflecting column names and table name
-        pass
+        commas = 0
+        too_many_commas = 0
+        camel_case_dictionary = {}
+        dictionary_for_conversion = self.object_specific_attributes_dictionary
+        for key in dictionary_for_conversion:
+            camel_case_key = re.sub('_.', lambda x: x.group()[1].upper(), key)
+            camel_case_dictionary[camel_case_key] = dictionary_for_conversion[key]
+            too_many_commas += 1
+        dictionary_concat = "{"
+        for key in camel_case_dictionary:
+            commas += 1
+            dictionary_concat += "'" + str(key) + "':"
+            dictionary_concat += "'" + str(camel_case_dictionary[key]) + "'"
+            if commas < too_many_commas:
+                dictionary_concat += ","
+        dictionary_concat += "}"
+        return literal_eval(dictionary_concat)
 
     def return_dictionary_for_sql(self) -> dict:
         # return dictionary with proper table name and column names for specific implementations
@@ -29,11 +46,11 @@ class TestRowObject:
         # should return a simple insert query for specific instance of object with correct column information
         # and table name in order to create new record based on a normalized table
         commas = 0
-        sql_query = "insert into"+str(self.object_specific_attributes_dictionary["table_name"])+" values(default,"
-        for key, values in self.object_specific_attributes_dictionary:
+        sql_query = "insert into "+str(self.object_specific_attributes_dictionary["table_name"])+" values(default,"
+        for key in self.object_specific_attributes_dictionary:
             commas += 1
-            if key != "table_name" or key != "unique_id":
-                sql_query += str(self.object_specific_attributes_dictionary[values])
+            if key != "table_name" and key != "unique_id":
+                sql_query += "'" + str(self.object_specific_attributes_dictionary[key])+ "'"
                 if commas < len(self.object_specific_attributes_dictionary):
                     sql_query += ","
         sql_query += ") returning *;"
